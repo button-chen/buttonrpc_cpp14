@@ -1,6 +1,7 @@
 
 # buttonrpc - a simple rpc framework for C++
-- ZeroMQ as the network layer.
+- ZeroMQ 作为网络层
+- 使用c++14开发
 
 ## Features
 - 轻量级，跨平台，简单易用
@@ -56,8 +57,7 @@ int main()
 
 
 ## Building
-- vs2010 或者更高版本 （为了兼容vs2010没有用到可变模板参数）
-- gcc/g++ 支持部分c++11特性即可
+- vs2015 或者更高版本
 
 ## Usage
 
