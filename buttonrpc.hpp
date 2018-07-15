@@ -24,7 +24,7 @@ template<>
 struct type_xx<void>{ typedef int8_t type; };
 
 
-// ´ò°ü°ïÖúÄ£°å
+// æ‰“åŒ…å¸®åŠ©æ¨¡æ¿
 template<typename Tuple, std::size_t... Is>
 void package_params_impl(Serializer& ds, const Tuple& t, std::index_sequence<Is...>)
 {
@@ -37,7 +37,7 @@ void package_params(Serializer& ds, const std::tuple<Args...>& t)
 	package_params_impl(ds, t, std::index_sequence_for<Args...>{});
 }
 
-// ÓÃtuple×ö²ÎÊıµ÷ÓÃº¯ÊıÄ£°åÀà
+// ç”¨tupleåšå‚æ•°è°ƒç”¨å‡½æ•°æ¨¡æ¿ç±»
 template<typename Function, typename Tuple, std::size_t... Index>
 decltype(auto) invoke_impl(Function&& func, Tuple&& t, std::index_sequence<Index...>)
 {
@@ -51,7 +51,7 @@ decltype(auto) invoke(Function&& func, Tuple&& t)
 	return invoke_impl(std::forward<Function>(func), std::forward<Tuple>(t), std::make_index_sequence<size>{});
 }
 
-// µ÷ÓÃ°ïÖúÀà£¬Ö÷ÒªÓÃÓÚ·µ»ØÊÇ·ñvoidµÄÇé¿ö
+// è°ƒç”¨å¸®åŠ©ç±»ï¼Œä¸»è¦ç”¨äºè¿”å›æ˜¯å¦voidçš„æƒ…å†µ
 template<typename R, typename F, typename ArgsTuple>
 typename std::enable_if<std::is_same<R, void>::value, typename type_xx<R>::type >::type
 call_helper(F f, ArgsTuple args) {
@@ -65,7 +65,7 @@ call_helper(F f, ArgsTuple args) {
 	return invoke(f, args);
 }
 
-// rpc Àà¶¨Òå
+// rpc ç±»å®šä¹‰
 class buttonrpc
 {
 public:
@@ -137,7 +137,6 @@ public:
 	template<typename R, typename... Params>
 	value_t<R> call(std::string name, Params... ps) {
 		using args_type = std::tuple<typename std::decay<Params>::type...>;
-		constexpr auto N = std::tuple_size<typename std::decay<args_type>::type>::value;
 		args_type args = std::make_tuple(ps...);
 
 		Serializer ds;
@@ -165,13 +164,13 @@ private:
 	template<typename F, typename S>
 	void callproxy(F fun, S* s, Serializer* pr, const char* data, int len);
 
-	// º¯ÊıÖ¸Õë
+	// å‡½æ•°æŒ‡é’ˆ
 	template<typename R, typename... Params>
 	void callproxy_(R(*func)(Params...), Serializer* pr, const char* data, int len) {
 		callproxy_(std::function<R(Params...)>(func), pr, data, len);
 	}
 
-	// Àà³ÉÔ±º¯ÊıÖ¸Õë
+	// ç±»æˆå‘˜å‡½æ•°æŒ‡é’ˆ
 	template<typename R, typename C, typename S, typename... Params>
 	void callproxy_(R(C::* func)(Params...), S* s, Serializer* pr, const char* data, int len) {
 
@@ -291,7 +290,7 @@ inline void buttonrpc::run()
 	}
 }
 
-// ´¦Àíº¯ÊıÏà¹Ø
+// å¤„ç†å‡½æ•°ç›¸å…³
 
 inline Serializer* buttonrpc::call_(std::string name, const char* data, int len)
 {

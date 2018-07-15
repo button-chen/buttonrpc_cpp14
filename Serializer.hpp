@@ -10,6 +10,8 @@
 #include <sstream>
 #include <algorithm>
 #include <cstdint>
+#include <utility>
+#include <tuple>
 using namespace std;
 
 class StreamBuffer : public vector<char>
@@ -20,7 +22,7 @@ public:
 		m_curpos = 0;
 		insert(begin(), in, in+len);
 	}
-	~StreamBuffer(){ }; 
+    ~StreamBuffer(){ }
 
 	void reset(){ m_curpos = 0; }
 	const char* data(){ return &(*this)[0]; }
@@ -38,15 +40,15 @@ public:
 	}
 
 private:
-	// µ±Ç°×Ö½ÚÁ÷Î»ÖÃ
+	// å½“å‰å­—èŠ‚æµä½ç½®
 	unsigned int m_curpos;
 };
 
 class Serializer
 {
 public:
-	Serializer() { m_byteorder = LittleEndian; };
-	~Serializer(){ };
+    Serializer() { m_byteorder = LittleEndian; }
+    ~Serializer(){ }
 
 	Serializer(StreamBuffer dev, int byteorder=LittleEndian){
 		m_byteorder = byteorder;
@@ -95,7 +97,7 @@ public:
 	template<typename T>
 	void input_type(T t);
 
-	// Ö±½Ó¸øÒ»¸ö³¤¶È£¬ ·µ»Øµ±Ç°Î»ÖÃÒÔºóx¸ö×Ö½ÚÊı¾İ
+	// ç›´æ¥ç»™ä¸€ä¸ªé•¿åº¦ï¼Œ è¿”å›å½“å‰ä½ç½®ä»¥åxä¸ªå­—èŠ‚æ•°æ®
 	void get_length_mem(char* p, int len){
 		memcpy(p, m_iodevice.current(), len);
 		m_iodevice.offset(len);
@@ -175,13 +177,13 @@ inline void Serializer::input_type(T t)
 template<>
 inline void Serializer::input_type(std::string in)
 {
-	// ÏÈ´æÈë×Ö·û´®³¤¶È
+	// å…ˆå­˜å…¥å­—ç¬¦ä¸²é•¿åº¦
 	uint16_t len = in.size();
 	char* p = reinterpret_cast< char*>(&len);
 	byte_orser(p, sizeof(uint16_t));
 	m_iodevice.input(p, sizeof(uint16_t));
 
-	// ´æÈë×Ö·û´®
+	// å­˜å…¥å­—ç¬¦ä¸²
 	if (len == 0) return;
 	char* d = new char[len];
 	memcpy(d, in.c_str(), len);
