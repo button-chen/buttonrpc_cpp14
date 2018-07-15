@@ -57,7 +57,7 @@ int main()
 
 
 ## Building
-- vs2015 或者更高版本
+- windows vs2015 或者更高版本,  linux 添加编译选项：-std=c++1z
 
 ## Usage
 
