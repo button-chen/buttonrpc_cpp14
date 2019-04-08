@@ -213,7 +213,7 @@ private:
 	std::map<std::string, std::function<void(Serializer*, const char*, int)>> m_handlers;
 
 	zmq::context_t m_context;
-	zmq::socket_t* m_socket;
+	std::unique_ptr<zmq::socket_t, std::function<void(zmq::socket_t*)>> m_socket;
 
 	rpc_err_code m_error_code;
 
@@ -225,8 +225,6 @@ inline buttonrpc::buttonrpc() : m_context(1){
 }
 
 inline buttonrpc::~buttonrpc(){
-	m_socket->close();
-	delete m_socket;
 	m_context.close();
 }
 
@@ -234,7 +232,7 @@ inline buttonrpc::~buttonrpc(){
 inline void buttonrpc::as_client( std::string ip, int port )
 {
 	m_role = RPC_CLIENT;
-	m_socket = new zmq::socket_t(m_context, ZMQ_REQ);
+	m_socket = std::unique_ptr<zmq::socket_t, std::function<void(zmq::socket_t*)>>(new zmq::socket_t(m_context, ZMQ_REQ), [](zmq::socket_t* sock){ sock->close(); delete sock; sock =nullptr;});
 	ostringstream os;
 	os << "tcp://" << ip << ":" << port;
 	m_socket->connect (os.str());
@@ -243,7 +241,7 @@ inline void buttonrpc::as_client( std::string ip, int port )
 inline void buttonrpc::as_server( int port )
 {
 	m_role = RPC_SERVER;
-	m_socket = new zmq::socket_t(m_context, ZMQ_REP);
+	m_socket = std::unique_ptr<zmq::socket_t, std::function<void(zmq::socket_t*)>>(new zmq::socket_t(m_context, ZMQ_REP), [](zmq::socket_t* sock){ sock->close(); delete sock; sock =nullptr;});
 	ostringstream os;
 	os << "tcp://*:" << port;
 	m_socket->bind (os.str());
