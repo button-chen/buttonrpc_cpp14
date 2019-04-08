@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include <functional>
+#include <memory>
 #include <zmq.hpp>
 #include "Serializer.hpp"
 
