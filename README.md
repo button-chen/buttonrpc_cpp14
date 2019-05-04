@@ -1,5 +1,5 @@
 
-# buttonrpc - a simple rpc framework for C++
+# buttonrpc - modern rpc framework for C++
 - ZeroMQ 作为网络层
 - 使用c++14开发
 
